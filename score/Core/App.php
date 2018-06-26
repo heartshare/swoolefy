@@ -177,14 +177,9 @@ class App extends \Swoolefy\Core\Component {
 		$cid = $this->coroutine_id;
 		// call hook callable
 		Hook::callHook(Hook::HOOK_AFTER_REQUEST);
-		
 		if(!empty(ZModel::$_model_instances[$cid])) {
 			unset(ZModel::$_model_instances[$cid]);
 		}
-		
-		// if() {
-
-		// }
 		self::clearComponent(self::$_destroy_components);
 		$_POST = $_GET = $_REQUEST = $_COOKIE = $_SESSION = [];
 	}

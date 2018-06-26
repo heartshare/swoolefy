@@ -15,10 +15,6 @@ class CoroutineManager {
 
 	protected static $coroutine_ids = [];
 
-	public function __construct() {
-		var_dump('kkkkkk');
-	}
-
 	public  function isEnableCoroutine() {
 		return BaseServer::isEnableCoroutine();
 	}
