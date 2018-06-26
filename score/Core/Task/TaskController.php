@@ -47,7 +47,7 @@ class TaskController extends Object {
 	 * __construct 初始化函数
 	 */
 	public function __construct() {
-		Application::$app = $this;
+		Application::getApp() = $this;
 		// 应用层配置
 		$this->config = Swfy::$appConfig;
 	}

@@ -78,7 +78,7 @@ class Swfy extends \Swoolefy\Core\Object {
 	 * @return   mixed
 	 */
 	public function __call($action, $args = []) {
-		Application::$app->response->end(json_encode([
+		Application::getApp()->response->end(json_encode([
 			'status' => 404,
 			'msg' => 'Calling unknown method: ' . get_called_class() . "::$action()",
 		]));
@@ -91,7 +91,7 @@ class Swfy extends \Swoolefy\Core\Object {
 	 * @return   mixed
 	 */
 	public static function __callStatic($action, $args = []) {
-		Application::$app->response->end(json_encode([
+		Application::getApp()->response->end(json_encode([
 			'status' => 404,
 			'msg' => 'Calling unknown static method: ' . get_called_class() . "::$action()",
 		]));

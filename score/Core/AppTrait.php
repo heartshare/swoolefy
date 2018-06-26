@@ -299,7 +299,7 @@ trait AppTrait {
 	 * @return   object
 	 */
 	public function getView() {
-		return Application::$app->view;
+		return Application::getApp()->view;
 	}
 
 
@@ -310,7 +310,7 @@ trait AppTrait {
 	 * @return  void   
 	 */
 	public function assign($name,$value) {
-		Application::$app->view->assign($name,$value);
+		Application::getApp()->view->assign($name,$value);
 	}
 
 	/**
@@ -319,7 +319,7 @@ trait AppTrait {
 	 * @return   void             
 	 */
 	public function display($template_file=null) {
-		Application::$app->view->display($template_file);
+		Application::getApp()->view->display($template_file);
 	}
 
 	/**
@@ -328,7 +328,7 @@ trait AppTrait {
 	 * @return   void              
 	 */
 	public function fetch($template_file=null) {
-		Application::$app->view->display($template_file);
+		Application::getApp()->view->display($template_file);
 	}
 
 	/**
@@ -338,7 +338,7 @@ trait AppTrait {
 	 * @return   void         
 	 */
 	public function returnJson($data,$formater = 'json') {
-		Application::$app->view->returnJson($data,$formater);
+		Application::getApp()->view->returnJson($data,$formater);
 	}
 
 	/**

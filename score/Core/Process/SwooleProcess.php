@@ -38,7 +38,7 @@ class SwooleProcess extends Object {
 	public function __construct(array $config=[]) {
 		// 将应用层配置保存在上下文的服务
 		$this->config = Swfy::$appConfig = $config;
-		Application::$app = $this;
+		Application::getApp() = $this;
 		// 注册错误处理事件
 		$protocol_config = Swfy::getConf();
 		if(isset($protocol_config['exception_hander_class']) && !empty($protocol_config['exception_hander_class'])) {

@@ -23,7 +23,7 @@ class AppInit extends Init {
 		// init 
 		$_POST = $_GET = $_REQUEST = $_COOKIE = $_SESSION = $_FILES = [];
 		//请求对象
-		$request = Application::$app->request;
+		$request = Application::getApp()->request;
 		self::resetServer($request);
 		self::resetPost($request);
 		self::resetGet($request);

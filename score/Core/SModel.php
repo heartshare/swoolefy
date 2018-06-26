@@ -34,7 +34,7 @@ class SModel extends Object {
 	 * __construct 初始化函数
 	 */
 	public function __construct() {
-		$this->config = Application::$app->config;
+		$this->config = Application::getApp()->config;
 		// 数据结构模型对象
 		$this->struct = new Struct();
 	}

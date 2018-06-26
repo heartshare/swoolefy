@@ -11,6 +11,8 @@
 
 namespace Swoolefy\Core;
 
+use  Swoolefy\Core\Coroutine\CoroutineManager;
+
 class ZModel {
 	/**
 	 * $_instance 工厂模式的单实例
@@ -24,12 +26,14 @@ class ZModel {
 	 * @return  object 
 	 */
 	public static function getInstance($class='') {
+		$cid = CoroutineManager::getInstance()->getCoroutineId();
 		$class = str_replace('/','\\',$class);
 		$class = trim($class,'\\');
-		if(isset(static::$_model_instances[$class]) && is_object(static::$_model_instances[$class])) {
-            return static::$_model_instances[$class];
+		if(isset(static::$_model_instances[$cid][$class]) && is_object(static::$_model_instances[$cid][$class])) {
+            return static::$_model_instances[$cid][$class];
         }
-		static::$_model_instances[$class] = new $class();
-        return static::$_model_instances[$class];
+		static::$_model_instances[$cid][$class] = new $class();
+        return static::$_model_instances[$cid][$class];
 	}
+
 }

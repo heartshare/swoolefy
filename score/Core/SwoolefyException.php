@@ -98,16 +98,16 @@ class SwoolefyException {
       }
       switch($errorType) {
         case 'error':
-              Application::$app->log->setChannel('Application')->setLogFilePath($logFilePath)->addError($errorMsg);
+              Application::getApp()->log->setChannel('Application')->setLogFilePath($logFilePath)->addError($errorMsg);
              break;
         case 'warning':
-              Application::$app->log->setChannel('Application')->setLogFilePath($logFilePath)->addWarning($errorMsg);
+              Application::getApp()->log->setChannel('Application')->setLogFilePath($logFilePath)->addWarning($errorMsg);
              break;
         case 'notice':
-              Application::$app->log->setChannel('Application')->setLogFilePath($logFilePath)->addNotice($errorMsg);
+              Application::getApp()->log->setChannel('Application')->setLogFilePath($logFilePath)->addNotice($errorMsg);
              break;
         case 'info':
-             Application::$app->log->setChannel('Application')->setLogFilePath($logFilePath)->addInfo($errorMsg);
+             Application::getApp()->log->setChannel('Application')->setLogFilePath($logFilePath)->addInfo($errorMsg);
              break;
       }
       

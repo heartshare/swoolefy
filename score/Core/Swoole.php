@@ -83,7 +83,7 @@ class Swoole extends Object {
 	 * @return void
 	 */
 	public function run($fd, $recv) {
-		Application::$app = $this;
+		Application::getApp() = $this;
 		$this->fd = $fd;
 		// 初始化处理
 		$this->_init($recv);
@@ -205,7 +205,7 @@ class Swoole extends Object {
 			ZModel::$_model_instances = [];
 		}
 		self::clearComponent(self::$_destroy_components);
-		Application::$app = null;
+		Application::getApp() = null;
 	}
 
  	use \Swoolefy\Core\ComponentTrait,\Swoolefy\Core\ServiceTrait;

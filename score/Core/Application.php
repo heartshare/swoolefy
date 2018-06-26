@@ -11,6 +11,8 @@
 
 namespace Swoolefy\Core;
 
+use Swoolefy\Core\Coroutine\CoroutineManager;
+
 class Application {
 	/**
 	 * $app 应用对象
@@ -23,6 +25,42 @@ class Application {
 	 * @var null
 	 */
 	public static $dump = null;
+
+	/**
+	 * setApp 
+	 * @param $object
+	 */
+	public static function setApp($obj) {
+		$cid = $obj->coroutine_id;
+		self::$app[$cid] = $obj;
+		return true;
+	}
+
+	/**
+	 * getApp 
+	 * @param  int|null $coroutine_id
+	 * @return $object
+	 */
+	public static function getApp(int $coroutine_id = null) {
+		$cid = CoroutineManager::getInstance()->getCoroutineId();
+		if(isset(self::$app[$cid])) {
+			return self::$app[$cid];
+		}
+		return null;
+	}
+
+	/**
+	 * removeApp 
+	 * @param  int|null $coroutine_id
+	 * @return boolean
+	 */
+	public static function removeApp(int $coroutine_id = null) {
+		$cid = CoroutineManager::getInstance()->getCoroutineId();
+		if(isset(self::$app[$cid])) {
+			unset(self::$app[$cid]);
+		}
+		return true;
+	} 
 
 	/**
 	 * __construct

@@ -108,18 +108,18 @@ class Session {
           * 注册钩子程序，在请求结束后保存sesion,防止多次注册
           */
         if(!$this->isStart) {
-            Application::$app->afterRequest([$this,'save']);
+            Application::getApp()->afterRequest([$this,'save']);
         }
 
         $driver_class = $this->cache_driver;
-        $this->driver = Application::$app->$driver_class;
+        $this->driver = Application::getApp()->$driver_class;
         $this->isStart = true;
         $this->readonly = $readonly;
-        $cookie_session_id = Application::$app->request->cookie[$this->cookie_key];
+        $cookie_session_id = Application::getApp()->request->cookie[$this->cookie_key];
         $this->session_id = $cookie_session_id;
         if(empty($cookie_session_id)) {
             $sess_id = MGeneral::randmd5(40);
-            Application::$app->response->cookie($this->cookie_key, $sess_id, time() + $this->cookie_lifetime, $this->cookie_path, $this->cookie_domain);
+            Application::getApp()->response->cookie($this->cookie_key, $sess_id, time() + $this->cookie_lifetime, $this->cookie_path, $this->cookie_domain);
             $this->session_id = $sess_id;
         }
         $_SESSION = $this->load($this->session_id);

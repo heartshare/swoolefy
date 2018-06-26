@@ -33,6 +33,12 @@ class BaseServer {
 	public static $service = null;
 
 	/**
+	 * $isEnableCoroutine 是否启用协程
+	 * @var boolean
+	 */
+	public static $isEnableCoroutine = false;
+
+	/**
 	 * $pack_check_type pack检查的方式
 	 * @var [type]
 	 */
@@ -106,6 +112,8 @@ class BaseServer {
 		self::createTables();
 		// check pack type
 		self::checkPackType();
+		// check coroutine
+		self::enableCoroutine();
 		// record start time
 		self::$_startTime = date('Y-m-d H:i:s',strtotime('now'));
 		
@@ -519,6 +527,34 @@ class BaseServer {
     	}
     	return false;
     }
+
+    /**
+     * enableCoroutine 
+     * @return 
+     */
+    public static function enableCoroutine() {
+    	if(version_compare(swoole_version(), '4.0.0', '>')) {
+    		if(!isset(static::$config['setting']['enable_coroutine'])) {
+    			self::$isEnableCoroutine = true;
+    			return ;
+    		}
+    		if(isset(static::$config['setting']['enable_coroutine']) && static::$config['setting']['enable_coroutine']) {
+    			self::$isEnableCoroutine = true;
+    			return ;
+    		}
+    	}
+    	// 低于4.0.1版本不能使用协程
+    	self::$isEnableCoroutine = false;	
+    }
+
+    /**
+     * isEnableCoroutine
+     * @return boolean
+     */
+	public static function isEnableCoroutine() {
+		return self::$isEnableCoroutine;
+    }
+
 
     /**
      * catchException 

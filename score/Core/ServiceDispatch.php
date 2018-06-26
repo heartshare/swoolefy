@@ -42,8 +42,8 @@ class ServiceDispatch extends AppDispatch {
 		parent::__construct();
 		$this->callable = $callable;
 		$this->params = $params;
-		Application::$app->mixed_params = $params;
-		Application::$app->rpc_pack_header = $rpc_pack_header;
+		Application::getApp()->mixed_params = $params;
+		Application::getApp()->rpc_pack_header = $rpc_pack_header;
 	}
 
 	/**

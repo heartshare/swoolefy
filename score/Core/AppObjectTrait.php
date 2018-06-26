@@ -20,7 +20,7 @@ trait AppObjectTrait {
 	 * @return   mixed
 	 */
 	public function __call($action,$args = []) {
-		Application::$app->response->end(json_encode([
+		Application::getApp()->response->end(json_encode([
 			'status' => 404,
 			'msg' => 'Calling unknown method: ' . get_called_class() . "::$action()",
 		]));
@@ -33,7 +33,7 @@ trait AppObjectTrait {
 	 * @return   mixed
 	 */
 	public static function __callStatic($action,$args = []) {
-		Application::$app->response->end(json_encode([
+		Application::getApp()->response->end(json_encode([
 			'status' => 404,
 			'msg' => 'Calling unknown static method: ' . get_called_class() . "::$action()",
 		]));
@@ -49,7 +49,7 @@ trait AppObjectTrait {
 	 */
 	public static function _die($html='',$msg='') {
 		// 直接结束请求
-		Application::$app->response->end($html);
+		Application::getApp()->response->end($html);
 		throw new \Exception($msg);
 	}
 }

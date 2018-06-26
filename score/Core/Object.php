@@ -63,7 +63,7 @@ class Object {
 	 * 直接获取component组件实例
 	 */
 	public function __get($name) {
-		return Application::$app->$name;
+		return Application::getApp()->$name;
 	}
 
 }
