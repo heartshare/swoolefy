@@ -11,9 +11,11 @@
 
 namespace Swoolefy\Core;
 
-class Swfy extends \Swoolefy\Core\Object {
+use Swoolefy\Core\Application;
 
-	use \Swoolefy\Core\ComponentTrait, \Swoolefy\Core\ServiceTrait;
+class Swfy extends \Swoolefy\Core\BaseObject {
+
+	use \Swoolefy\Core\ServiceTrait;
 	/**
 	 * $server swoole服务超全局变量
 	 * @var null
@@ -45,7 +47,7 @@ class Swfy extends \Swoolefy\Core\Object {
 	 * @return void
 	 */
 	public static function createComponent(string $com_alias_name, array $defination = []) {
-		return self::creatObject($com_alias_name, $defination);
+		return Application::getApp()->creatObject($com_alias_name, $defination);
 	}
 
 	/**
@@ -54,7 +56,7 @@ class Swfy extends \Swoolefy\Core\Object {
 	 * @return void
 	 */
 	public static function removeComponent($com_alias_name = null) {
-		return self::clearComponent($com_alias_name);
+		return Application::getApp()->clearComponent($com_alias_name);
 	}
 
 	/**
@@ -63,14 +65,7 @@ class Swfy extends \Swoolefy\Core\Object {
 	 * @return void
 	 */
 	public static function getComponent(string $com_alias_name = null) {
-		if(!$com_alias_name) {
-			return self::$Di;
-		}else {
-			if(isset(self::$Di[$com_alias_name])) {
-				return self::$Di[$com_alias_name];
-			}
-			return false;
-		}	
+		return Application::getApp()->getComponents($com_alias_name);
 	}
 
 	/**

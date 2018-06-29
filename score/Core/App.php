@@ -56,8 +56,8 @@ class App extends \Swoolefy\Core\Component {
 	public function __construct(array $config=[]) {
 		// 将应用层配置保存在上下文的服务
 		$this->config = Swfy::$appConfig = $config;
-		// Component组件创建
-		parent::creatObject();
+		// // Component组件创建
+		// parent::creatObject();
 		// 注册错误处理事件
 		$protocol_config = Swfy::getConf();
 		if(isset($protocol_config['exception_hander_class']) && !empty($protocol_config['exception_hander_class'])) {
@@ -73,7 +73,7 @@ class App extends \Swoolefy\Core\Component {
 	 */
 	protected function init() {
 		// 初始化超全局变量数组和对象
-		AppInit::_init();
+		// AppInit::_init();
 		// session start,在一些微服务的http请求中无需session
 		if(isset($this->config['session_start']) && $this->config['session_start']) {
 			if(is_object($this->session)) {
@@ -96,6 +96,8 @@ class App extends \Swoolefy\Core\Component {
 	 * @return void
 	 */
 	public function run($request, $response, $extend_data = null) {
+		// Component组件创建
+		parent::creatObject();
 		// 赋值对象
 		$this->request = $request;
 		$this->response = $response;
@@ -180,8 +182,6 @@ class App extends \Swoolefy\Core\Component {
 		if(!empty(ZModel::$_model_instances[$cid])) {
 			unset(ZModel::$_model_instances[$cid]);
 		}
-		self::clearComponent(self::$_destroy_components);
-		$_POST = $_GET = $_REQUEST = $_COOKIE = $_SESSION = [];
 	}
 
 	/**

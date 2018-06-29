@@ -16,13 +16,13 @@ trait AppTrait {
 	 * $previousUrl,记录url
 	 * @var array
 	 */
-	public static $previousUrl = [];
+	public $previousUrl = [];
 
 	/**
 	 * $selfModel 控制器对应的自身model
 	 * @var array
 	 */
-	public static $selfModel = [];
+	public $selfModel = [];
 	/**
 	 * _beforeAction 
 	 * @return   mixed
@@ -109,6 +109,90 @@ trait AppTrait {
         }
     }
 
+    /**
+     * getRequestParam 
+     * @param    string   $key
+     * @param    string   $mothod
+     * @return   mxixed
+     */
+    public function getRequestParam(string $name = null) {
+    	$mothod = strtolower($this->getMethod());
+    	switch($mothod) {
+    		case 'get' : 
+    			$input = $this->request->get;
+    		break;
+
+    		case 'post':
+    			$input = $this->request->post;
+    		break; 
+    		default :
+    			$input = [];
+    		break;
+    	}
+    	if($name) {
+    		$value = (isset($input[$name]) && !empty($input[$name])) ? $input[$name] : null;
+    	}else {
+    		$value = array_merge($this->request->get, $this->request->post);
+    	}
+
+    	return $value;
+    }
+
+    /**
+     * getCookieParam 
+     * @param    string|null   $name
+     * @return   mixed
+     */
+    public function getCookieParam(string $name = null) {
+    	if($name) {
+    		$value = isset($this->request->cookie[$name]) ? $this->request->cookie[$name] : null;	
+    	}
+
+    	return $this->request->cookie;
+    }
+
+    /**
+     * getServerParam 
+     * @param    string|null   $name
+     * @return   mixed
+     */
+    public function getServerParam(string $name = null) {
+    	if($name) {
+    		$value = isset($this->request->server[$name]) ? $this->request->server[$name] : null;	
+    	}
+
+    	return $this->request->server;
+    }
+
+    /**
+     * getHeaderParam 
+     * @param    string|null   $name
+     * @return   mixed
+     */
+    public function getHeaderParam(string $name = null) {
+    	if($name) {
+    		$value = isset($this->request->header[$name]) ? $this->request->header[$name] : null;	
+    	}
+
+    	return $this->request->header;
+    }
+
+    /**
+     * getFilesParam 
+     * @return   mixed
+     */
+    public function getUploadFiles() {
+    	return $this->request->files;
+    }
+
+    /**
+     * getRawContent 
+     * @return  mixed
+     */
+    public function getRawContent() {
+    	return $this->request->rawContent();
+    }
+
 	/**
 	 * getMethod 
 	 * @return   string
@@ -175,10 +259,10 @@ trait AppTrait {
 	 */
 	public function rememberUrl($name=null,$url=null,$ssl=false) {
 		if($url && $name) {
-			static::$previousUrl[$name] = $url;
+			$this->previousUrl[$name] = $url;
 		}else {
 			// 获取当前的url保存
-			static::$previousUrl['home_url'] = $this->getHomeUrl($ssl);
+			$this->previousUrl['home_url'] = $this->getHomeUrl($ssl);
 		}
 	}
 
@@ -189,13 +273,13 @@ trait AppTrait {
 	 */
 	public function getPreviousUrl($name=null) {
 		if($name) {
-			if(isset(static::$previousUrl[$name])) {
-				return static::$previousUrl[$name];
+			if(isset($this->previousUrl[$name])) {
+				return $this->previousUrl[$name];
 			}
 			return null;
 		}else {
-			if(isset(static::$previousUrl['home_url'])) {
-				return static::$previousUrl['home_url'];
+			if(isset($this->previousUrl['home_url'])) {
+				return $this->previousUrl['home_url'];
 			}
 
 			return null;
@@ -273,12 +357,12 @@ trait AppTrait {
 			}
 		}
 		// 从内存数组中返回
-		if(isset(self::$selfModel[$modelClass])) {
-			return self::$selfModel[$modelClass];
+		if(isset($this->selfModel[$modelClass])) {
+			return $this->selfModel[$modelClass];
 		}else {
 			try{
 				$modelInstance = new $modelClass;
-				return self::$selfModel[$modelClass] = $modelInstance;
+				return $this->selfModel[$modelClass] = $modelInstance;
 			}catch(\Exception $e) {
 				throw new \Exception($e->getMessage(), 1);
 			}

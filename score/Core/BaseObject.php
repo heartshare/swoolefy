@@ -14,7 +14,7 @@ namespace Swoolefy\Core;
 use Swoolefy\Core\Swfy;
 use Swoolefy\Core\Timer\TickManager;
 
-class Object {
+class BaseObject {
 
 	/**
      * Returns the fully qualified name of this class.
