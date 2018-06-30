@@ -56,8 +56,6 @@ class App extends \Swoolefy\Core\Component {
 	public function __construct(array $config=[]) {
 		// 将应用层配置保存在上下文的服务
 		$this->config = Swfy::$appConfig = $config;
-		// // Component组件创建
-		// parent::creatObject();
 		// 注册错误处理事件
 		$protocol_config = Swfy::getConf();
 		if(isset($protocol_config['exception_hander_class']) && !empty($protocol_config['exception_hander_class'])) {
@@ -72,8 +70,8 @@ class App extends \Swoolefy\Core\Component {
 	 * @return void
 	 */
 	protected function init() {
-		// 初始化超全局变量数组和对象
-		// AppInit::_init();
+		// 初始化对象
+		AppInit::_init();
 		// session start,在一些微服务的http请求中无需session
 		if(isset($this->config['session_start']) && $this->config['session_start']) {
 			if(is_object($this->session)) {
@@ -86,7 +84,7 @@ class App extends \Swoolefy\Core\Component {
 	 * boostrap 初始化引导
 	 */
 	protected function bootstrap() {
-		Swfy::$config['application_index']::bootstrap($_REQUEST);	
+		Swfy::$config['application_index']::bootstrap($this->getRequestParam());	
 	}
 
 	/**

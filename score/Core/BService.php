@@ -30,7 +30,7 @@ class BService extends BaseObject {
 	 * $selfModel 控制器对应的自身model
 	 * @var array
 	 */
-	public static $selfModel = [];
+	public $selfModel = [];
 
 	/**
 	 * $fd 
@@ -192,8 +192,6 @@ class BService extends BaseObject {
 		if(method_exists($this,'_afterAction')) {
 			static::_afterAction();
 		}
-		// 销毁单例model实例
-		static::$selfModel = [];
 	}
 
 	use \Swoolefy\Core\ServiceTrait;

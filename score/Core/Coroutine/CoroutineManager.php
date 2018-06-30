@@ -25,8 +25,9 @@ class CoroutineManager {
 	 */
 	public function getCoroutineId() {
 		if($this->isEnableCoroutine()) {
-			$main_cid = co::getuid();
-			return $main_cid;
+			$cid = co::getuid();
+			$cid = isset($cid) ? $cid : 0;
+			return $cid;
 		}
 
 		if(isset(self::$cid) && !empty(self::$cid)) {

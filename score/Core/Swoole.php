@@ -12,6 +12,7 @@
 namespace Swoolefy\Core;
 
 use Swoolefy\Core\Swfy;
+use Swoolefy\Core\Coroutine\CoroutineManager;
 
 class Swoole extends BaseObject {
 
@@ -39,6 +40,12 @@ class Swoole extends BaseObject {
 	public $rpc_pack_header = [];
 
 	/**
+	 * $coroutine_id 
+	 * @var [type]
+	 */
+	public $coroutine_id;
+
+	/**
  	 * $ExceptionHanderClass 异常处理类
  	 * @var string
  	 */
@@ -51,8 +58,6 @@ class Swoole extends BaseObject {
 	public function __construct(array $config=[]) {
 		// 将应用层配置保存在上下文的服务
 		$this->config = Swfy::$appConfig = $config;
-		// Component组件创建
-		self::creatObject();
 		// 注册错误处理事件
 		$protocol_config = Swfy::getConf();
 		if(isset($protocol_config['exception_hander_class']) && !empty($protocol_config['exception_hander_class'])) {
@@ -83,7 +88,11 @@ class Swoole extends BaseObject {
 	 * @return void
 	 */
 	public function run($fd, $recv) {
-		Application::getApp() = $this;
+		$coroutine_id = CoroutineManager::getInstance()->getCoroutineId();
+		$this->coroutine_id = $coroutine_id;
+		// Component组件创建
+		$this->creatObject();
+		Application::setApp($this);
 		$this->fd = $fd;
 		// 初始化处理
 		$this->_init($recv);
@@ -201,11 +210,9 @@ class Swoole extends BaseObject {
 	public function end() {
 		// call hook callable
 		Hook::callHook(Hook::HOOK_AFTER_REQUEST);
-		if(!empty(ZModel::$_model_instances)) {
-			ZModel::$_model_instances = [];
+		if(!empty(ZModel::$_model_instances[$cid])) {
+			unset(ZModel::$_model_instances[$cid]);
 		}
-		self::clearComponent(self::$_destroy_components);
-		Application::getApp() = null;
 	}
 
  	use \Swoolefy\Core\ComponentTrait,\Swoolefy\Core\ServiceTrait;

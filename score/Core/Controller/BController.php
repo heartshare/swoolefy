@@ -73,10 +73,6 @@ class BController extends \Swoolefy\Core\AppObject {
 		if(method_exists($this,'_afterAction')) {
 			static::_afterAction();
 		}
-		// destroy
-		static::$previousUrl = [];
-		// destroy
-		static::$selfModel = [];
 	}
 
 	//使用trait的复用特性

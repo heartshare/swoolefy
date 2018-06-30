@@ -11,6 +11,7 @@
 
 namespace Swoolefy\Core;
 
+use Swoolefy\Core\Swfy;
 use Swoolefy\Core\Coroutine\CoroutineManager;
 
 class Application {
@@ -31,9 +32,15 @@ class Application {
 	 * @param $object
 	 */
 	public static function setApp($obj) {
-		$cid = $obj->coroutine_id;
-		self::$app[$cid] = $obj;
-		return true;
+		if(Swfy::isWorkerProcess()) {
+			$cid = $obj->coroutine_id;
+			self::$app[$cid] = $obj;
+			return true;
+		}else {
+			// task进程不适用coroutine
+			self::$app = $obj;
+		}
+		
 	}
 
 	/**
@@ -41,12 +48,18 @@ class Application {
 	 * @param  int|null $coroutine_id
 	 * @return $object
 	 */
-	public static function getApp(int $coroutine_id = null) {
-		$cid = CoroutineManager::getInstance()->getCoroutineId();
-		if(isset(self::$app[$cid])) {
-			return self::$app[$cid];
+	public static function getApp($coroutine_id = null) {
+		if(Swfy::isWorkerProcess()) {
+			$cid = CoroutineManager::getInstance()->getCoroutineId();
+			if(isset(self::$app[$cid])) {
+				return self::$app[$cid];
+			}else {
+				return null;
+			}
+		}else {
+			// task进程不适用coroutine
+			return self::$app;
 		}
-		return null;
 	}
 
 	/**
@@ -54,12 +67,19 @@ class Application {
 	 * @param  int|null $coroutine_id
 	 * @return boolean
 	 */
-	public static function removeApp(int $coroutine_id = null) {
-		$cid = CoroutineManager::getInstance()->getCoroutineId();
-		if(isset(self::$app[$cid])) {
-			unset(self::$app[$cid]);
+	public static function removeApp($coroutine_id = null) {
+		if(Swfy::isWorkerProcess()) {
+			$cid = CoroutineManager::getInstance()->getCoroutineId();
+			if(isset(self::$app[$cid])) {
+				unset(self::$app[$cid]);
+			}
+			return true;
+		}else {
+			//task进程不适用coroutine
+			self::$app = null;
+			return true;
 		}
-		return true;
+		
 	} 
 
 	/**

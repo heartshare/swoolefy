@@ -27,7 +27,7 @@ class ProcessController extends BaseObject {
 	 * $selfModel 控制器对应的自身model
 	 * @var array
 	 */
-	public static $selfModel = [];
+	public $selfModel = [];
 
 	/**
 	 * __construct 初始化函数
@@ -58,15 +58,9 @@ class ProcessController extends BaseObject {
 	 */
 	public function __destruct() {
 		// call hook callable
-		Hook::callHook(Hook::HOOK_AFTER_REQUEST);
-
 		if(method_exists($this,'_afterAction')) {
 			static::_afterAction();
 		}
-		// 初始化销毁所有得单例model实例
-		static::$selfModel = [];
-		// 销毁某些组件
-		self::clearComponent(self::$_destroy_components);
 
 	}
 

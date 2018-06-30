@@ -41,6 +41,12 @@ class Session {
     public $driver = null;
 
     /**
+     * $session 寄存session的数据
+     * @var array
+     */
+    public $_SESSION = [];
+
+    /**
      * cookie的设置
      * @var integer
      */
@@ -122,7 +128,7 @@ class Session {
             Application::getApp()->response->cookie($this->cookie_key, $sess_id, time() + $this->cookie_lifetime, $this->cookie_path, $this->cookie_domain);
             $this->session_id = $sess_id;
         }
-        $_SESSION = $this->load($this->session_id);
+        $this->_SESSION = $this->load($this->session_id);
         return true;
     }
 
@@ -178,7 +184,7 @@ class Session {
      */
     public function set($key, $data) {
         if(is_string($key) && isset($data)) {
-            $_SESSION[$key] = $data;
+            $this->_SESSION[$key] = $data;
             return true;
         }
         return false;
@@ -191,9 +197,9 @@ class Session {
      */
     public function get($key = null) {
         if(is_null($key)) {
-            return $_SESSION;
+            return $this->_SESSION;
         }
-        return $_SESSION[$key];
+        return $this->_SESSION[$key];
     }
 
     /**
@@ -205,7 +211,7 @@ class Session {
         if(!$key) {
             return false;
         }
-        return isset($_SESSION[$key]);
+        return isset($this->_SESSION[$key]);
     }
 
     /**
@@ -215,7 +221,7 @@ class Session {
      */
     public function delete($key) {
         if($this->has($key)) {
-            unset($_SESSION[$key]);
+            unset($this->_SESSION[$key]);
             return true;
         }
         return false;      
@@ -227,8 +233,8 @@ class Session {
      * @return  
      */
     public function destroy() {
-        if(!empty($_SESSION)) {
-            $_SESSION = [];
+        if(!empty($this->_SESSION)) {
+            $this->_SESSION = [];
             // 使cookie失效
             setcookie($this->cookie_key, $this->session_id, time() - 600, $this->cookie_path, $this->cookie_domain);
             // redis中完全删除session_key
@@ -240,11 +246,11 @@ class Session {
 
     /**
      * reGenerateSessionId 重新生成session_id
-     * @param    boolean   $ismerge  生成新的session_id是否继承合并当前session的数据，默认true,如需要产生一个完全新的空的$_SESSION，可以设置false
+     * @param    boolean   $ismerge  生成新的session_id是否继承合并当前session的数据，默认true,如需要产生一个完全新的空的$this->_SESSION，可以设置false
      * @return   void
      */
     public function reGenerateSessionId($ismerge=true) {
-        $session_data = $_SESSION;
+        $session_data = $this->_SESSION;
         // 先cookie的session_id失效
         setcookie($this->cookie_key, $this->session_id, time() - 600, $this->cookie_path, $this->cookie_domain);
         // 设置session_id=null
@@ -252,7 +258,7 @@ class Session {
         // 产生新的session_id和返回空的$_SESSION数组
         $this->start();
         if($ismerge) {
-            $_SESSION = array_merge($_SESSION, $session_data);
+            $this->_SESSION = array_merge($this->_SESSION, $session_data);
         }
     }
     

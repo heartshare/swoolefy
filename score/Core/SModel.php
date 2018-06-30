@@ -106,5 +106,5 @@ class SModel extends BaseObject {
 		static::_afterAction();
 	}
 
-	use \Swoolefy\Core\ComponentTrait, \Swoolefy\Core\ServiceTrait;
+	use \Swoolefy\Core\ServiceTrait;
 }

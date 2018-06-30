@@ -41,13 +41,20 @@ class TaskController extends BaseObject {
 	 * $selfModel 控制器对应的自身model
 	 * @var array
 	 */
-	public static $selfModel = [];
+	public $selfModel = [];
+
+	/**
+	 * $event_hooks 钩子事件
+	 * @var array
+	 */
+	public $event_hooks = [];
+	const HOOK_AFTER_REQUEST = 1;
 
 	/**
 	 * __construct 初始化函数
 	 */
 	public function __construct() {
-		Application::getApp() = $this;
+		Application::setApp($this);
 		// 应用层配置
 		$this->config = Swfy::$appConfig;
 	}
@@ -68,20 +75,40 @@ class TaskController extends BaseObject {
 		return true;
 	}
 
+	public function afterRequest(callable $callback, $prepend = false) {
+		if(is_callable($callback, true, $callable_name)) {
+			$key = md5($callable_name);
+			if($prepend) {
+				if(!isset($this->event_hooks[self::HOOK_AFTER_REQUEST])) {
+					$this->event_hooks[self::HOOK_AFTER_REQUEST] = [];
+				}
+				if(!isset($this->event_hooks[self::HOOK_AFTER_REQUEST][$key])) {
+					$this->event_hooks[self::HOOK_AFTER_REQUEST][$key] = array_merge([$key=>$callback], $this->event_hooks[self::HOOK_AFTER_REQUEST]);
+				}
+				return true;
+			}else {
+				// 防止重复设置
+				if(!isset($this->event_hooks[self::HOOK_AFTER_REQUEST][$key])) {
+					$this->event_hooks[self::HOOK_AFTER_REQUEST][$key] = $callback;
+				}
+				return true;
+			}
+		}else {
+			throw new \Exception(__NAMESPACE__.'::'.__function__.' the first param of type is callable');
+		}
+		
+	}
+
 	/**
 	 * __destruct 返回数据之前执行,重新初始化一些静态变量
 	 */
 	public function __destruct() {
-		// call hook callable
-		Hook::callHook(Hook::HOOK_AFTER_REQUEST);
 
 		if(method_exists($this,'_afterAction')) {
 			static::_afterAction();
 		}
-		// 销毁单例model实例
-		static::$selfModel = [];
-		// 销毁某些组件
-		self::clearComponent(self::$_destroy_components);
+		// destroy
+		Application::removeApp();
 
 	}
 

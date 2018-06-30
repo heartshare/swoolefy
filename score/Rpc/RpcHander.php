@@ -55,6 +55,7 @@ class RpcHander extends Swoole implements HanderInterface {
 	public function run($fd, $recv) {
 		// 必须要执行父类的run方法
 		parent::run($fd, $recv);
+		var_dump($recv);
 		// 当前进程worker进程
 		if($this->isWorkerProcess()) {
 			// packet_length_checkout方式
