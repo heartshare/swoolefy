@@ -173,6 +173,7 @@ class Session {
      * @return string
      */
     public function getSessionId() {
+        var_dump('session');
         return $this->session_id;
     }
 

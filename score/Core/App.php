@@ -12,6 +12,7 @@
 namespace Swoolefy\Core;
 
 use Swoolefy\Core\Swfy;
+use Swoolefy\Core\ZModel;
 use Swoolefy\Core\AppInit;
 use Swoolefy\Core\HttpRoute;
 use Swoolefy\Core\BaseServer;
@@ -174,12 +175,9 @@ class App extends \Swoolefy\Core\Component {
 	 * @return void
 	 */
 	public function clearStaticVar() {
-		$cid = $this->coroutine_id;
 		// call hook callable
 		Hook::callHook(Hook::HOOK_AFTER_REQUEST);
-		if(!empty(ZModel::$_model_instances[$cid])) {
-			unset(ZModel::$_model_instances[$cid]);
-		}
+		ZModel::removeInstance();
 	}
 
 	/**

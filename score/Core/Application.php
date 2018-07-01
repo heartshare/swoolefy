@@ -31,14 +31,55 @@ class Application {
 	 * setApp 
 	 * @param $object
 	 */
-	public static function setApp($obj) {
+	public static function setApp($App) {
+
 		if(Swfy::isWorkerProcess()) {
-			$cid = $obj->coroutine_id;
-			self::$app[$cid] = $obj;
-			return true;
+			// process进程将会定义成worker进程,ticker的callback应用实例必须继承ProcessController
+			if($App instanceof \Swoolefy\Core\Process\ProcessController) {
+				$cid = $App->coroutine_id;
+				if(isset(self::$app[$cid])) {
+					unset(self::$app[$cid]);
+				}
+				self::$app[$cid] = $App;
+				return true;
+			}
+			// 在worker进程中进行,AppObject是http应用,swoole是rpc,websocket,udp应用，TickControllershitick的回调应用
+			if($App instanceof \Swoolefy\Core\AppObject || $App instanceof \Swoolefy\Core\Swoole || $App instanceof \Swoolefy\Core\Timer\TickController) {
+				$cid = $App->coroutine_id;
+				if(isset(self::$app[$cid])) {
+					unset(self::$app[$cid]);
+				}
+				self::$app[$cid] = $App;
+				return true;
+			}			 
+		}else if(Swfy::isTaskProcess()) {
+			// task中不创建协程，也不能使用协程,ticker的callback可以创建协程
+			if($App instanceof \Swoolefy\Core\Timer\TickController) {
+				$cid = $App->coroutine_id;
+				if(isset(self::$app[$cid])) {
+					unset(self::$app[$cid]);
+				}
+				self::$app[$cid] = $App;
+				return true;
+			}else if($App instanceof \Swoolefy\Core\Task\TaskController) {
+				$cid = $App->coroutine_id;
+				if(isset(self::$app[$cid])) {
+					unset(self::$app[$cid]);
+				}
+				self::$app[$cid] = $App;
+				return true;
+			}
 		}else {
-			// task进程不适用coroutine
-			self::$app = $obj;
+			// process进程中不创建协程，也不使用协程，但是协程中的ticker的callback可以创建协程
+			if($App instanceof \Swoolefy\Core\Process\ProcessController) {
+				$cid = $App->coroutine_id;
+				if(isset(self::$app[$cid])) {
+					unset(self::$app[$cid]);
+				}
+				self::$app[$cid] = $App;
+				return true;
+			}
+			return false;
 		}
 		
 	}
@@ -49,15 +90,10 @@ class Application {
 	 * @return $object
 	 */
 	public static function getApp($coroutine_id = null) {
-		if(Swfy::isWorkerProcess()) {
-			$cid = CoroutineManager::getInstance()->getCoroutineId();
-			if(isset(self::$app[$cid])) {
-				return self::$app[$cid];
-			}else {
-				return null;
-			}
+		$cid = CoroutineManager::getInstance()->getCoroutineId();
+		if(isset(self::$app[$cid])) {
+			return self::$app[$cid];
 		}else {
-			// task进程不适用coroutine
 			return self::$app;
 		}
 	}
@@ -68,18 +104,15 @@ class Application {
 	 * @return boolean
 	 */
 	public static function removeApp($coroutine_id = null) {
-		if(Swfy::isWorkerProcess()) {
-			$cid = CoroutineManager::getInstance()->getCoroutineId();
-			if(isset(self::$app[$cid])) {
-				unset(self::$app[$cid]);
-			}
-			return true;
-		}else {
-			//task进程不适用coroutine
-			self::$app = null;
+		$cid = CoroutineManager::getInstance()->getCoroutineId();
+		if($coroutine_id) {
+			$cid = $coroutine_id;
+		}
+		if(isset(self::$app[$cid])) {
+			unset(self::$app[$cid]);
 			return true;
 		}
-		
+		return true;	
 	} 
 
 	/**

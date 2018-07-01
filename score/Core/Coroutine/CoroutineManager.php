@@ -26,7 +26,10 @@ class CoroutineManager {
 	public function getCoroutineId() {
 		if($this->isEnableCoroutine()) {
 			$cid = co::getuid();
-			$cid = isset($cid) ? $cid : 0;
+			// 在task|process中不直接支持使用协程
+			if($cid == -1) {
+				$cid = 'task_process';
+			}
 			return $cid;
 		}
 

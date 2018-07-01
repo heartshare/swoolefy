@@ -12,6 +12,7 @@
 namespace Swoolefy\Core;
 
 use Swoolefy\Core\Swfy;
+use Swoolefy\Core\ZModel;
 use Swoolefy\Core\Coroutine\CoroutineManager;
 
 class Swoole extends BaseObject {
@@ -210,9 +211,8 @@ class Swoole extends BaseObject {
 	public function end() {
 		// call hook callable
 		Hook::callHook(Hook::HOOK_AFTER_REQUEST);
-		if(!empty(ZModel::$_model_instances[$cid])) {
-			unset(ZModel::$_model_instances[$cid]);
-		}
+		ZModel::removeInstance();
+		Application::removeApp();
 	}
 
  	use \Swoolefy\Core\ComponentTrait,\Swoolefy\Core\ServiceTrait;

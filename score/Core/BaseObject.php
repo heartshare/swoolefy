@@ -17,6 +17,12 @@ use Swoolefy\Core\Timer\TickManager;
 class BaseObject {
 
 	/**
+	 * $coroutine_id 
+	 * @var [type]
+	 */
+	public $coroutine_id;
+
+	/**
      * Returns the fully qualified name of this class.
      * @return string the fully qualified name of this class.
      */

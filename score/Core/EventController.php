@@ -9,7 +9,7 @@
 +----------------------------------------------------------------------
 */
 
-namespace Swoolefy\Core\Task;
+namespace Swoolefy\Core;
 
 use Swoolefy\Core\Swfy;
 use Swoolefy\Core\ZModel;
@@ -17,21 +17,7 @@ use Swoolefy\Core\BaseObject;
 use Swoolefy\Core\Application;
 use Swoolefy\Core\Coroutine\CoroutineManager;
 
-class TaskController extends BaseObject {
-	/**
-	 * $from_worker_id 记录当前任务from的woker投递
-	 * @see https://wiki.swoole.com/wiki/page/134.html
-	 * @var null
-	 */
-	public $from_worker_id = null;
-
-	/**
-	 * $task_id 任务的ID
-	 * @see  https://wiki.swoole.com/wiki/page/134.html
-	 * @var null
-	 */
-	public $task_id = null;
-	
+class EventController extends BaseObject {
 	/**
 	 * $config 应用层配置
 	 * @var null
@@ -56,26 +42,12 @@ class TaskController extends BaseObject {
 	 */
 	public function __construct() {
 		// 应用层配置
-		$this->config = Swfy::$appConfig;
+		$this->config = Swfy::$appConfig;		
 		$coroutine_id = CoroutineManager::getInstance()->getCoroutineId();
-		$this->coroutine_id = $coroutine_id;
-		Application::setApp($this);
-	}
-
-	/**
-	 * beforeAction 在处理实际action之前执行
-	 * @return   mixed
-	 */
-	public function _beforeAction() {
-		return true;
-	}
-
-	/**
-	 * afterAction 在返回数据之前执行
-	 * @return   mixed
-	 */
-	public function _afterAction() {
-		return true;
+		if($coroutine_id) {
+			$this->coroutine_id = $coroutine_id;
+			Application::setApp($this);
+		}
 	}
 
 	/**
@@ -110,7 +82,7 @@ class TaskController extends BaseObject {
 
 	/**
 	 * callEventHook 
-	 * @return [type] [description]
+	 * @return void
 	 */
 	public function callAfterEventHook() {
 		if(isset($this->event_hooks[self::HOOK_AFTER_REQUEST]) && !empty($this->event_hooks[self::HOOK_AFTER_REQUEST])) {
@@ -121,6 +93,22 @@ class TaskController extends BaseObject {
 	}
 
 	/**
+	 * beforeAction 在处理实际action之前执行
+	 * @return   mixed
+	 */
+	public function _beforeAction() {
+		return true;
+	}
+
+	/**
+	 * afterAction 在返回数据之前执行
+	 * @return   mixed
+	 */
+	public function _afterAction() {
+		return true;
+	}
+
+	/**
 	 * __destruct 返回数据之前执行,重新初始化一些静态变量
 	 */
 	public function __destruct() {
@@ -128,16 +116,13 @@ class TaskController extends BaseObject {
 		if(method_exists($this, 'callAfterEventHook')) {
 			$this->callAfterEventHook();
 		};
+		// call hook callable
 		if(method_exists($this, '_afterAction')) {
 			static::_afterAction();
 		}
-		// destroy
 		ZModel::removeInstance();
-		// destroy
 		Application::removeApp();
-
 	}
 
 	use \Swoolefy\Core\ComponentTrait,\Swoolefy\Core\ServiceTrait;
-	
 }

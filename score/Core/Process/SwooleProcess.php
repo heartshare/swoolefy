@@ -12,9 +12,9 @@
 namespace Swoolefy\Core\Process;
 
 use Swoolefy\Core\Swfy;
-use Swoolefy\Core\BaseObject;
 use Swoolefy\Core\Hook;
 use Swoolefy\Core\ZModel;
+use Swoolefy\Core\BaseObject;
 use Swoolefy\Core\Application;
 
 class SwooleProcess extends BaseObject {
@@ -26,6 +26,13 @@ class SwooleProcess extends BaseObject {
 	public $config = null;
 
 	/**
+	 * $event_hooks 钩子事件
+	 * @var array
+	 */
+	public $event_hooks = [];
+	const HOOK_AFTER_REQUEST = 1;
+
+	/**
  	 * $ExceptionHanderClass 异常处理类
  	 * @var string
  	 */
@@ -35,10 +42,9 @@ class SwooleProcess extends BaseObject {
 	 * __construct
 	 * @param $config 应用层配置
 	 */
-	public function __construct(array $config=[]) {
+	public function __construct(array $config = []) {
 		// 将应用层配置保存在上下文的服务
-		$this->config = Swfy::$appConfig = $config;
-		Application::getApp() = $this;
+		$this->config = array_merge(Swfy::$appConfig, $config);
 		// 注册错误处理事件
 		$protocol_config = Swfy::getConf();
 		if(isset($protocol_config['exception_hander_class']) && !empty($protocol_config['exception_hander_class'])) {
@@ -49,14 +55,29 @@ class SwooleProcess extends BaseObject {
 	}
 
  	/**
-	 * afterRequest 请求结束后注册钩子执行操作
-	 * @param	mixed   $callback 
-	 * @param	boolean $prepend
-	 * @return	void
+	 * afterRequest 
+	 * @param  callable $callback
+	 * @param  boolean  $prepend
+	 * @return mixed
 	 */
 	public function afterRequest(callable $callback, $prepend = false) {
-		if(is_callable($callback)) {
-			Hook::addHook(Hook::HOOK_AFTER_REQUEST, $callback, $prepend);
+		if(is_callable($callback, true, $callable_name)) {
+			$key = md5($callable_name);
+			if($prepend) {
+				if(!isset($this->event_hooks[self::HOOK_AFTER_REQUEST])) {
+					$this->event_hooks[self::HOOK_AFTER_REQUEST] = [];
+				}
+				if(!isset($this->event_hooks[self::HOOK_AFTER_REQUEST][$key])) {
+					$this->event_hooks[self::HOOK_AFTER_REQUEST][$key] = array_merge([$key=>$callback], $this->event_hooks[self::HOOK_AFTER_REQUEST]);
+				}
+				return true;
+			}else {
+				// 防止重复设置
+				if(!isset($this->event_hooks[self::HOOK_AFTER_REQUEST][$key])) {
+					$this->event_hooks[self::HOOK_AFTER_REQUEST][$key] = $callback;
+				}
+				return true;
+			}
 		}else {
 			throw new \Exception(__NAMESPACE__.'::'.__function__.' the first param of type is callable');
 		}
@@ -64,15 +85,29 @@ class SwooleProcess extends BaseObject {
 	}
 
 	/**
+	 * callEventHook 
+	 * @return void
+	 */
+	public function callAfterEventHook() {
+		if(isset($this->event_hooks[self::HOOK_AFTER_REQUEST]) && !empty($this->event_hooks[self::HOOK_AFTER_REQUEST])) {
+			foreach($this->event_hooks[self::HOOK_AFTER_REQUEST] as $func) {
+				$func();
+			}
+		}
+	}
+
+	/**
 	 * end
 	 * @return  
 	 */
 	public function end() {
-		// call hook callable
-		Hook::callHook(Hook::HOOK_AFTER_REQUEST);
-		ZModel::$_model_instances = [];
-		// 销毁某些组件
-		self::clearComponent(self::$_destroy_components);
+		if(method_exists($this,'_afterAction')) {
+			static::_afterAction();
+		}
+		// callhooks
+		$this->callAfterEventHook();
+		// destroy
+		Application::removeApp();
 	}
 
  	use \Swoolefy\Core\ComponentTrait;
