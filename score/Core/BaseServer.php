@@ -125,7 +125,7 @@ class BaseServer {
 	 */
 	public static function checkVersion() {
 		if(version_compare(phpversion(), '5.6.0', '<')) {
-			throw new \Exception("php version must be > 5.6.0,we suggest use php7.0+ version", 1);
+			throw new \Exception("php version must be >= 7.0, we suggest use php7.1+ version", 1);
 		}
 
 		if(!extension_loaded('swoole')) {

@@ -42,12 +42,33 @@ class EventController extends BaseObject {
 	 */
 	public function __construct() {
 		// 应用层配置
-		$this->config = Swfy::$appConfig;		
+		$this->config = Swfy::$appConfig;
 		$coroutine_id = CoroutineManager::getInstance()->getCoroutineId();
+		$this->coroutine_id = $coroutine_id;
+		Application::setApp($this);
+	}
+
+	/**
+	 * setApp 重置APP对象
+	 * @param  string  $coroutine_id
+	 */
+	public function setApp($coroutine_id = null) {
 		if($coroutine_id) {
+			Application::removeApp();
 			$this->coroutine_id = $coroutine_id;
 			Application::setApp($this);
+			return  true;
 		}
+
+		return false;
+	}
+
+	/**
+	 * getCid 
+	 * @return  mixed
+	 */
+	public function getCid() {
+		return $this->coroutine_id;
 	}
 
 	/**

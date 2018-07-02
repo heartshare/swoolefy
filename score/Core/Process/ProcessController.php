@@ -11,11 +11,7 @@
 
 namespace Swoolefy\Core\Process;
 
-use Swoolefy\Core\Swfy;
-use Swoolefy\Core\ZModel;
-use Swoolefy\Core\Application;
 use Swoolefy\Core\EventController;
-use Swoolefy\Core\Coroutine\CoroutineManager;
 
 class ProcessController extends EventController {
 	

@@ -25,20 +25,28 @@ class EventApp {
 	 * @param  string $class
 	 * @return $this
 	 */
-	public function registerApp($class) {
+	public function registerApp($class, ...$args) {
 		if(is_object($class)) {
 			$this->event_app = $class;
 		}
 		if(is_string($class)) {
-			$this->event_app = new $class;
+			$this->event_app = new $class(...$args);
 		}
 
 		if(!($this->event_app instanceof \Swoolefy\Core\EventController)) {
 			unset($this->event_app);
 			throw new \Exception("$class must extends \Swoolefy\Core\EventController");
 		}
-		
+
 		return $this;
+	}
+
+	/**
+	 * getAppCid 获取当前应用实例的协程id
+	 * @return  
+	 */
+	public function getCid() {
+		return $this->event_app->getCid();
 	}
 
 	/**
@@ -48,8 +56,7 @@ class EventApp {
 	 * return  $this
 	 */
 	public function __call(string $action, $args = []) {
-		call_user_func_array([$this->event_app, $action], $args);
-		return $this;
+		return call_user_func_array([$this->event_app, $action], $args);
 	}
 
 	/**
@@ -57,5 +64,6 @@ class EventApp {
 	 */
 	public function __destruct() {
 		Application::removeApp();
+		unset($this->event_app);
 	}
 }

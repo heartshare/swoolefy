@@ -36,7 +36,7 @@ class CoroutineManager {
 		if(isset(self::$cid) && !empty(self::$cid)) {
 			return self::$cid;
 		}
-		self::$cid = time();
+		self::$cid = (string)time().rand(1,999);
 		return self::$cid;
 		
 	}

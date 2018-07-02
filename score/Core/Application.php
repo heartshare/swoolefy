@@ -44,7 +44,7 @@ class Application {
 				return true;
 			}
 			// 在worker进程中进行,AppObject是http应用,swoole是rpc,websocket,udp应用，TickControllershitick的回调应用
-			if($App instanceof \Swoolefy\Core\AppObject || $App instanceof \Swoolefy\Core\Swoole || $App instanceof \Swoolefy\Core\Timer\TickController) {
+			if($App instanceof \Swoolefy\Core\AppObject || $App instanceof \Swoolefy\Core\Swoole || $App instanceof \Swoolefy\Core\Timer\TickController || $App instanceof \Swoolefy\Core\EventController) {
 				$cid = $App->coroutine_id;
 				if(isset(self::$app[$cid])) {
 					unset(self::$app[$cid]);
@@ -91,6 +91,9 @@ class Application {
 	 */
 	public static function getApp($coroutine_id = null) {
 		$cid = CoroutineManager::getInstance()->getCoroutineId();
+		if($coroutine_id) {
+			$cid = $coroutine_id;
+		}
 		if(isset(self::$app[$cid])) {
 			return self::$app[$cid];
 		}else {
