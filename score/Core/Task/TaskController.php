@@ -13,7 +13,9 @@ namespace Swoolefy\Core\Task;
 
 use Swoolefy\Core\EventController;
 
+// TaskController 仅仅用于http服务，而rpc,websocket,udp服务BService
 class TaskController extends EventController {
+
 	/**
 	 * $from_worker_id 记录当前任务from的woker投递
 	 * @see https://wiki.swoole.com/wiki/page/134.html

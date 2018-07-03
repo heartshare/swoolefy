@@ -43,7 +43,7 @@ class Application {
 				self::$app[$cid] = $App;
 				return true;
 			}
-			// 在worker进程中进行,AppObject是http应用,swoole是rpc,websocket,udp应用，TickControllershitick的回调应用
+			// 在worker进程中进行,AppObject是http应用,swoole是rpc,websocket,udp应用，TickController是tick的回调应用
 			if($App instanceof \Swoolefy\Core\AppObject || $App instanceof \Swoolefy\Core\Swoole || $App instanceof \Swoolefy\Core\Timer\TickController || $App instanceof \Swoolefy\Core\EventController) {
 				$cid = $App->coroutine_id;
 				if(isset(self::$app[$cid])) {
@@ -61,7 +61,9 @@ class Application {
 				}
 				self::$app[$cid] = $App;
 				return true;
-			}else if($App instanceof \Swoolefy\Core\Task\TaskController) {
+			}
+			// http的task任务
+			if($App instanceof \Swoolefy\Core\Task\TaskController) {
 				$cid = $App->coroutine_id;
 				if(isset(self::$app[$cid])) {
 					unset(self::$app[$cid]);
@@ -69,9 +71,9 @@ class Application {
 				self::$app[$cid] = $App;
 				return true;
 			}
-		}else {
-			// process进程中不创建协程，也不使用协程，但是协程中的ticker的callback可以创建协程
-			if($App instanceof \Swoolefy\Core\Process\ProcessController) {
+
+			// rpc,websocket,udp的task
+			if($App instanceof \Swoolefy\Core\Swoole) {
 				$cid = $App->coroutine_id;
 				if(isset(self::$app[$cid])) {
 					unset(self::$app[$cid]);
@@ -79,7 +81,7 @@ class Application {
 				self::$app[$cid] = $App;
 				return true;
 			}
-			return false;
+
 		}
 		
 	}

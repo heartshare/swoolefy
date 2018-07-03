@@ -189,6 +189,14 @@ class Swoole extends BaseObject {
 		}
 	}
 
+	/**
+	 * getFd worker进程中可以读取到值，task进程不能，默认返回null
+	 * @return  mixed
+	 */
+	public function getFd() {
+		return $this->fd;
+	}
+
  	/**
 	 * afterRequest 请求结束后注册钩子执行操作
 	 * @param	mixed   $callback 
@@ -201,7 +209,6 @@ class Swoole extends BaseObject {
 		}else {
 			throw new \Exception(__NAMESPACE__.'::'.__function__.' the first param of type is callable');
 		}
-		
 	}
 
 	/**

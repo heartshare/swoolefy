@@ -10,6 +10,10 @@ class CoroutineManager {
 
 	protected static $cid = null;
 
+	/**
+	 * isEnableCoroutine 
+	 * @return   boolean
+	 */
 	public  function isEnableCoroutine() {
 		return BaseServer::isEnableCoroutine();
 	}
@@ -37,7 +41,16 @@ class CoroutineManager {
 		
 	}
 
-	public function setTest() {
-
+	/**
+	 * getCoroutinStatus 
+	 * @return   array
+	 */
+	public function getCoroutinStatus() {
+		if(method_exists('co', 'stats')) {
+			return \co::stats();
+		}
+		return null;
+		
 	}
+
 }
