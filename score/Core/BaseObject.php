@@ -11,8 +11,7 @@
 
 namespace Swoolefy\Core;
 
-use Swoolefy\Core\Swfy;
-use Swoolefy\Core\Timer\TickManager;
+use Swoolefy\Core\Application;
 
 class BaseObject {
 

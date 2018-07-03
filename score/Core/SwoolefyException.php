@@ -11,6 +11,9 @@
 
 namespace Swoolefy\Core;
 
+use Swoolefy\Core\Application;
+use Swoolefy\Core\Coroutine\CoroutineManager;
+
 class SwoolefyException {
 	/**
 	 * fatalError 致命错误捕获,两种情况触发
@@ -87,30 +90,30 @@ class SwoolefyException {
      */
     public static function shutHalt($errorMsg, $errorType = 'error') {
       $logFilePath = rtrim(LOG_PATH,'/').'/runtime.log';
-      
       if(is_file($logFilePath)) {
           $logFilesSize = filesize($logFilePath);
       }
-
       // 定时清除这个log文件
       if($logFilesSize > 1024 * 20) {
         @file_put_contents($logFilePath,'');
       }
+
+      $app = !empty(Application::getApp()) ? Application::getApp() : (new \Swoolefy\Tool\Log);
+      var_dump($app);
       switch($errorType) {
         case 'error':
-              Application::getApp()->log->setChannel('Application')->setLogFilePath($logFilePath)->addError($errorMsg);
+              $app->log->setChannel('Application')->setLogFilePath($logFilePath)->addError($errorMsg);
              break;
         case 'warning':
-              Application::getApp()->log->setChannel('Application')->setLogFilePath($logFilePath)->addWarning($errorMsg);
+              $app->log->setChannel('Application')->setLogFilePath($logFilePath)->addWarning($errorMsg);
              break;
         case 'notice':
-              Application::getApp()->log->setChannel('Application')->setLogFilePath($logFilePath)->addNotice($errorMsg);
+              $app->log->setChannel('Application')->setLogFilePath($logFilePath)->addNotice($errorMsg);
              break;
         case 'info':
-             Application::getApp()->log->setChannel('Application')->setLogFilePath($logFilePath)->addInfo($errorMsg);
+             $app->log->setChannel('Application')->setLogFilePath($logFilePath)->addInfo($errorMsg);
              break;
       }
-      
       return;
     }
 }

@@ -129,7 +129,7 @@ class BaseServer {
 		}
 
 		if(!extension_loaded('swoole')) {
-			throw new \Exception("you are not install swoole extentions,please install it where version >= 1.9.17 or >=2.0.5 from https://github.com/swoole/swoole-src", 1);
+			throw new \Exception("you are not install swoole extentions,please install it where version >= 1.9.17 or >=4.0.1 from https://github.com/swoole/swoole-src", 1);
 		}
 
 		if(!extension_loaded('swoole_serialize')) {

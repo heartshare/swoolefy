@@ -28,8 +28,9 @@ class CoroutineManager {
 			// 在task|process中不直接支持使用协程
 			if($cid == -1) {
 				$cid = 'cid_task_process';
+			}else {
+				$cid = 'cid_'.$cid;
 			}
-			$cid = 'cid_'.$cid;
 			return $cid;
 		}
 

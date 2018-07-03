@@ -12,8 +12,8 @@
 namespace Swoolefy\Core;
 
 use Swoolefy\Core\Swfy;
-use Swoolefy\Core\BaseObject;
 use Swoolefy\Core\Struct;
+use Swoolefy\Core\BaseObject;
 use Swoolefy\Core\Application;
 
 class SModel extends BaseObject {

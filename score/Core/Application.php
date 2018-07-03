@@ -81,7 +81,6 @@ class Application {
 				self::$app[$cid] = $App;
 				return true;
 			}
-
 		}
 		
 	}

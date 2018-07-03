@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 defined('VENDOR_ROOT') or define('VENDOR_ROOT', dirname(__DIR__));
@@ -31,6 +32,7 @@ function install() {
 	}else {
 		echo "installing swoolefy server failed!\n\n";
 	}
+	
 	exit;
 }
 

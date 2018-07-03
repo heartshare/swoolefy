@@ -12,11 +12,11 @@
 namespace Swoolefy\Core;
 
 use Swoolefy\Core\Swfy;
-use Swoolefy\Core\BaseObject;
 use Swoolefy\Core\Hook;
-use Swoolefy\Core\Application;
-use Swoolefy\Core\BaseServer;
 use Swoolefy\Tcp\TcpServer;
+use Swoolefy\Core\BaseObject;
+use Swoolefy\Core\BaseServer;
+use Swoolefy\Core\Application;
 
 class BService extends BaseObject {
 
