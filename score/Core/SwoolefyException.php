@@ -11,9 +11,6 @@
 
 namespace Swoolefy\Core;
 
-use Swoolefy\Core\Application;
-use Swoolefy\Core\Coroutine\CoroutineManager;
-
 class SwoolefyException {
 	/**
 	 * fatalError 致命错误捕获,两种情况触发
@@ -98,20 +95,20 @@ class SwoolefyException {
         @file_put_contents($logFilePath,'');
       }
 
-      $app = !empty(Application::getApp()) ? Application::getApp() : (new \Swoolefy\Tool\Log);
-      var_dump($app);
+      $log = new \Swoolefy\Tool\Log;
+
       switch($errorType) {
         case 'error':
-              $app->log->setChannel('Application')->setLogFilePath($logFilePath)->addError($errorMsg);
+              $log->setChannel('Application')->setLogFilePath($logFilePath)->addError($errorMsg);
              break;
         case 'warning':
-              $app->log->setChannel('Application')->setLogFilePath($logFilePath)->addWarning($errorMsg);
+              $log->setChannel('Application')->setLogFilePath($logFilePath)->addWarning($errorMsg);
              break;
         case 'notice':
-              $app->log->setChannel('Application')->setLogFilePath($logFilePath)->addNotice($errorMsg);
+              $log->setChannel('Application')->setLogFilePath($logFilePath)->addNotice($errorMsg);
              break;
         case 'info':
-             $app->log->setChannel('Application')->setLogFilePath($logFilePath)->addInfo($errorMsg);
+             $log->setChannel('Application')->setLogFilePath($logFilePath)->addInfo($errorMsg);
              break;
       }
       return;

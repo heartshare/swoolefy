@@ -193,8 +193,13 @@ abstract class HttpServer extends BaseServer {
 		 * worker进程异常错误回调函数
 		 */
 		$this->webserver->on('WorkerError', function(http_server $server, $worker_id, $worker_pid, $exit_code, $signal) {
-			// worker停止的触发函数
-			$this->startCtrl->workerError($server, $worker_id, $worker_pid, $exit_code, $signal);
+			try{
+				// worker停止的触发函数
+				$this->startCtrl->workerError($server, $worker_id, $worker_pid, $exit_code, $signal);
+			}catch(\Exception $e) {
+				self::catchException($e);
+			}
+			
 		});
 
 		/**
@@ -202,8 +207,13 @@ abstract class HttpServer extends BaseServer {
 		 */
 		if(static::compareSwooleVersion()) {
 			$this->webserver->on('WorkerExit', function(http_server $server, $worker_id) {
-				// worker退出的触发函数
-				$this->startCtrl->workerExit($server, $worker_id);
+				try{
+					// worker退出的触发函数
+					$this->startCtrl->workerExit($server, $worker_id);
+				}catch(\Exception $e) {
+					self::catchException($e);
+				}
+				
 			});
 		}
 		

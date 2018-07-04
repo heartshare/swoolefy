@@ -172,17 +172,26 @@ abstract class UdpServer extends BaseServer {
 		 * 停止worker进程
 		 */
 		$this->udpserver->on('WorkerStop', function(udp_server $server, $worker_id) {
-			// worker停止时的回调处理
-			$this->startCtrl->workerStop($server, $worker_id);
-
+			try{
+				// worker停止时的回调处理
+				$this->startCtrl->workerStop($server, $worker_id);
+			}catch(\Exception $e) {
+				self::catchException($e);
+			}
+			
 		});
 
 		/**
 		 * worker进程异常错误回调函数
 		 */
 		$this->udpserver->on('WorkerError', function(udp_server $server, $worker_id, $worker_pid, $exit_code, $signal) {
-			// worker停止的触发函数
-			$this->startCtrl->workerError($server, $worker_id, $worker_pid, $exit_code, $signal);
+			try{
+				// worker停止的触发函数
+				$this->startCtrl->workerError($server, $worker_id, $worker_pid, $exit_code, $signal);
+			}catch(\Exception $e) {
+				self::catchException($e);
+			}
+			
 		});
 
 		/**
@@ -190,10 +199,15 @@ abstract class UdpServer extends BaseServer {
 		 */
 		if(static::compareSwooleVersion()) {
 			$this->udpserver->on('WorkerExit', function(udp_server $server, $worker_id) {
-				// worker退出的触发函数
-				$this->startCtrl->workerExit($server, $worker_id);
-			});
+				try{
+					// worker退出的触发函数
+					$this->startCtrl->workerExit($server, $worker_id);
+				}catch(\Exception $e) {
+					self::catchException($e);
+				}
+			});		
 		}
+		
 		$this->udpserver->start();
 	}
 }
