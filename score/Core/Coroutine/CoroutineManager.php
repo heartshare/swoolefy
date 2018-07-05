@@ -8,14 +8,23 @@ class CoroutineManager {
 
 	use \Swoolefy\Core\SingletonTrait;
 
+	/**
+	 * coroutine_id的前缀
+	 */
+	const  PREFIX_CID = 'cid_';
+
+	/**
+	 * $cid 
+	 * @var null
+	 */
 	protected static $cid = null;
 
 	/**
 	 * isEnableCoroutine 
 	 * @return   boolean
 	 */
-	public  function isEnableCoroutine() {
-		return BaseServer::isEnableCoroutine();
+	public  function canEnableCoroutine() {
+		return BaseServer::canEnableCoroutine();
 	}
 	
 	/**
@@ -23,23 +32,25 @@ class CoroutineManager {
 	 * @return 
 	 */
 	public function getCoroutineId() {
-		if($this->isEnableCoroutine()) {
+		// 大于4.x版本
+		if($this->canEnableCoroutine()) {
 			$cid = \co::getuid();
 			// 在task|process中不直接支持使用协程
 			if($cid == -1) {
-				$cid = 'cid_task_process';
+				$cid = self::PREFIX_CID.'task_process';
 			}else {
-				$cid = 'cid_'.$cid;
+				$cid = self::PREFIX_CID.$cid;
 			}
 			return $cid;
-		}
-
-		if(isset(self::$cid) && !empty(self::$cid)) {
+		}else {
+			// 1.x, 2.x版本不能使用协程，2.x编译时需要关闭协程选项
+			if(isset(self::$cid) && !empty(self::$cid)) {
+				return self::$cid;
+			}
+			$cid = (string)time().'_'.rand(1,999);
+			self::$cid = self::PREFIX_CID.$cid;
 			return self::$cid;
 		}
-		self::$cid = (string)time().rand(1,999);
-		return self::$cid;
-		
 	}
 
 	/**
@@ -47,11 +58,14 @@ class CoroutineManager {
 	 * @return   array
 	 */
 	public function getCoroutinStatus() {
-		if(method_exists('co', 'stats')) {
-			return \co::stats();
+		// 大于4.x版本
+		if($this->canEnableCoroutine()) {
+			if(method_exists('co', 'stats')) {
+				return \co::stats();
+			}
 		}
+		// 1.x, 2.x版本
 		return null;
 		
 	}
-
 }

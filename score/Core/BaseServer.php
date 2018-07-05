@@ -534,27 +534,19 @@ class BaseServer {
      */
     public static function enableCoroutine() {
     	if(version_compare(swoole_version(), '4.0.0', '>')) {
-    		if(!isset(static::$config['setting']['enable_coroutine'])) {
-    			self::$isEnableCoroutine = true;
-    			return ;
-    		}
-    		if(isset(static::$config['setting']['enable_coroutine']) && static::$config['setting']['enable_coroutine']) {
-    			self::$isEnableCoroutine = true;
-    			return ;
-    		}
+    		self::$isEnableCoroutine = true;
     	}
-    	// 低于4.0.1版本不能使用协程
-    	self::$isEnableCoroutine = false;	
+    	// 低于4.0版本不能使用协程
+    	self::$isEnableCoroutine = false;
     }
 
     /**
      * isEnableCoroutine
      * @return boolean
      */
-	public static function isEnableCoroutine() {
+	public static function canEnableCoroutine() {
 		return self::$isEnableCoroutine;
     }
-
 
     /**
      * catchException 

@@ -51,7 +51,7 @@ class Application {
 				}
 				self::$app[$cid] = $App;
 				return true;
-			}			 
+			}		 
 		}else if(Swfy::isTaskProcess()) {
 			// task中不创建协程，也不能使用协程,ticker的callback可以创建协程
 			if($App instanceof \Swoolefy\Core\Timer\TickController) {
