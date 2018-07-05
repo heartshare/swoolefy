@@ -11,9 +11,9 @@
 
 namespace Swoolefy\Udp;
 
-use Swoole\Server as udp_server;
-use Swoolefy\Core\BaseServer;
 use Swoolefy\Core\Swfy;
+use Swoolefy\Core\BaseServer;
+use Swoole\Server as udp_server;
 
 abstract class UdpServer extends BaseServer {
 	/**

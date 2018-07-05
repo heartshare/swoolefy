@@ -11,12 +11,12 @@
 
 namespace Swoolefy\Http;
 
-use Swoole\Http\Server as http_server;
-use Swoolefy\Core\BaseServer;
 use Swoolefy\Core\Swfy;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Swoolefy\Core\BaseServer;
 use Swoolefy\Core\Application;
+use Swoole\Http\Server as http_server;
 
 abstract class HttpServer extends BaseServer {
 	/**

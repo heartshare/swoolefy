@@ -11,13 +11,11 @@
 
 namespace Swoolefy\Websocket;
 
-use Swoole\WebSocket\Server as websocket_server;
-use Swoolefy\Core\BaseServer;
-use Swoole\Server as tcp_server;
 use Swoolefy\Core\Swfy;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
-use Swoolefy\Core\Pack;
+use Swoolefy\Core\BaseServer;
+use Swoole\WebSocket\Server as websocket_server;
 
 abstract class WebsocketServer extends BaseServer {
 	/**
@@ -46,12 +44,6 @@ abstract class WebsocketServer extends BaseServer {
 	 * @var null
 	 */
 	public $webserver = null;
-
-	/**
-	 * $pack 封解包对象
-	 * @var null
-	 */
-	public $pack = null;
 
 	/**
 	 * $startctrl
@@ -222,6 +214,7 @@ abstract class WebsocketServer extends BaseServer {
 		$this->webserver->on('close', function(websocket_server $server, $fd) {
 			try{
 				static::onClose($server, $fd);
+				return true;
 			}catch(\Exception $e) {
 				self::catchException($e);
 			}
@@ -232,7 +225,7 @@ abstract class WebsocketServer extends BaseServer {
 		 * @see https://wiki.swoole.com/wiki/page/397.html
 		 */
 		if((isset(self::$config['accept_http']) && self::$config['accept_http'] == true)) {
-			$this->webserver->on('request',function(Request $request, Response $response) {
+			$this->webserver->on('request', function(Request $request, Response $response) {
 				try{
 					// google浏览器会自动发一次请求/favicon.ico,在这里过滤掉
 					if($request->server['path_info'] == '/favicon.ico' || $request->server['request_uri'] == '/favicon.ico') {

@@ -32,7 +32,6 @@ class Application {
 	 * @param $object
 	 */
 	public static function setApp($App) {
-
 		if(Swfy::isWorkerProcess()) {
 			// process进程将会定义成worker进程,ticker的callback应用实例必须继承ProcessController
 			if($App instanceof \Swoolefy\Core\Process\ProcessController) {
@@ -62,6 +61,7 @@ class Application {
 				self::$app[$cid] = $App;
 				return true;
 			}
+			
 			// http的task任务
 			if($App instanceof \Swoolefy\Core\Task\TaskController) {
 				$cid = $App->coroutine_id;
@@ -122,13 +122,10 @@ class Application {
 	/**
 	 * __construct
 	 */
-	public function __construct() {
-		
-	}
+	public function __construct() {}
 
 	/**
 	 * __destruct
 	 */
-	public function __destruct() {
-	}
+	public function __destruct() {}
 }

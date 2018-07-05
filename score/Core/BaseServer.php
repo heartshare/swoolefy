@@ -535,9 +535,13 @@ class BaseServer {
     public static function enableCoroutine() {
     	if(version_compare(swoole_version(), '4.0.0', '>')) {
     		self::$isEnableCoroutine = true;
+    		return;
+    	}else {
+    		// 低于4.0版本不能使用协程
+    		self::$isEnableCoroutine = false;
+    		return;
     	}
-    	// 低于4.0版本不能使用协程
-    	self::$isEnableCoroutine = false;
+    	
     }
 
     /**
