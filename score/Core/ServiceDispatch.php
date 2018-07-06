@@ -54,8 +54,6 @@ class ServiceDispatch extends AppDispatch {
 		list($class, $action) = $this->callable;
 		$class = trim($class, '/');
 		if(!self::$routeCacheFileMap[$class]) {
-			// 类文件不存在
-			$file = $this->checkClass($class);
 			if(!$this->checkClass($class)){
 				// TODO
 				throw new \Exception("when dispatch, $class file is not exist", 1);

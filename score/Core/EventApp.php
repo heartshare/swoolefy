@@ -78,7 +78,8 @@ class EventApp {
 	 */
 	public function __call(string $action, $args = []) {
 		try{
-			return call_user_func_array([$this->event_app, $action], $args);
+			// return call_user_func_array([$this->event_app, $action], $args);
+			$this->event_app->$action(...$args);
 		}catch(\Exception $e) {
 			throw new \Exception($e->getMessage());
 		}

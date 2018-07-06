@@ -23,7 +23,7 @@ class BaseObject {
 
 	/**
 	 * $coroutine_id
-	 * @var [type]
+	 * @var  string
 	 */
 	public $coroutine_id;
 
