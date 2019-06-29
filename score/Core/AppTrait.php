@@ -614,6 +614,17 @@ trait AppTrait {
 		}
 	}
 
+    /**
+     * @param $req
+     */
+	protected function parseArgs($req) {}
+
+    /**
+     * @param      $req
+     * @param null $date
+     */
+	protected function parse($req, $date = null) {}
+
 	/**
 	 * dump，调试函数
 	 * @param    string|array  $var
