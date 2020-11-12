@@ -14,30 +14,35 @@ namespace Swoolefy\Core;
 use Swoolefy\Core\Swfy;
 use Swoolefy\Core\ZFactory;
 use Swoolefy\Core\AppInit;
-use Swoole\Http\Request;
-use Swoole\Http\Response;
+use Swoole\Http\Request as swooleRequest;
+use Swoole\Http\Response as swooleResponse;
 use Swoolefy\Core\HttpRoute;
 use Swoolefy\Core\BaseServer;
 use Swoolefy\Core\Application;
 use Swoolefy\Core\Log\LogManager;
 use Swoolefy\Core\Controller\BController;
 use Swoolefy\Core\Coroutine\CoroutineManager;
+use Swoolefy\Http\Psr\Request;
+use Swoolefy\Http\Psr\Response;
+use Swoolefy\Http\Psr\Environment;
+use Swoolefy\Http\Psr\Body;
+
 
 class App extends \Swoolefy\Core\Component {
 
     use \Swoolefy\Core\AppTrait,\Swoolefy\Core\ServiceTrait;
 
     /**
-	 * $request 当前请求的对象
-	 * @var Request
+	 * $swooleRequest swoole当前请求的对象
+	 * @var swooleRequest
 	 */
-	public $request = null;
+	public $swooleRequest = null;
 
 	/**
-	 * $response 当前请求的响应对象
-	 * @var Response
+	 * $swooleResponse swoole当前请求的响应对象
+	 * @var swooleResponse
 	 */
-	public $response = null;
+	public $swooleResponse = null;
 
 	/**
 	 * $app_conf 当前应用层的配置
@@ -78,12 +83,10 @@ class App extends \Swoolefy\Core\Component {
 
     /**
      * init 初始化函数
-     * @param Request $request
      * @return void
      * @throws \Exception
      */
-	protected function _init($request) {
-		AppInit::init($request);
+	protected function _init() {
 		if(isset($this->app_conf['session_start']) && $this->app_conf['session_start']) {
 			if(is_object($this->get('session'))) {
 				$this->get('session')->start();
@@ -106,20 +109,33 @@ class App extends \Swoolefy\Core\Component {
 
 	/**
 	 * run 执行
-	 * @param  $request
-	 * @param  $response
+	 * @param  $swooleRequest
+	 * @param  $swooleResponse
      * @throws \Throwable
 	 * @return mixed
 	 */
-	public function run($request, $response, $extend_data = null) {
+	public function run($swooleRequest, $swooleResponse, $extend_data = null) {
 	    try {
+            AppInit::init($swooleRequest);
+            $this->swooleRequest = $swooleRequest;
+            $this->swooleResponse = $swooleResponse;
             $this->coroutine_id = CoroutineManager::getInstance()->getCoroutineId();
+            $this->registerDefaultComponents();
             parent::creatObject();
-            $this->request = $request;
-            $this->response = $response;
             Application::setApp($this);
+
+            /**@var Response $response */
+            $response = $this->container['response'];
+            $body = new Body(fopen('php://temp', 'r+'));
+            $body->write(json_encode(['name'=>'vvvvvvv']));
+            $response = $response->withBody($body);
+            $response = $response->withHeader('Content-Type','application/json; charset=UTF-8');
+            $this->swooleResponse->write($response->getBody());
+            return;
+
+
             $this->defer();
-            $this->_init($request);
+            $this->_init();
             $this->_bootstrap();
             if(!$this->catchAll()) {
                 $route = new HttpRoute($extend_data);
@@ -134,6 +150,32 @@ class App extends \Swoolefy\Core\Component {
         	}
         }
 	}
+
+	public function registerDefaultComponents() {
+        $server = $this->swooleRequest->server;
+        $environment = Environment::mock($server);
+        $headers = $this->swooleRequest->header ?? [];
+        $cookies = $this->swooleRequest->cookie ?? [];
+        $protocols = explode('/', $server['SERVER_PROTOCOL']);
+        $httpVersion = array_pop($protocols);
+
+        // register request component
+	    parent::creatObject('request', function() use ($environment, $headers, $cookies) {
+            $request = \Swoolefy\Http\Psr\Request::createFromEnvironment($environment, $headers, $cookies);
+            $request->setSwooleRequest($this->swooleRequest);
+            return $request;
+        });
+
+	    // register response component
+	    parent::creatObject('response', function() use($httpVersion) {
+            $headers = new \Swoolefy\Http\Psr\Headers(['Content-Type' => 'application/json; charset=UTF-8']);
+            $response = new \Swoolefy\Http\Psr\Response(200, $headers);
+            if($httpVersion >= 1.0) {
+                return $response->withProtocolVersion($httpVersion);
+            }
+            return $response;
+        });
+    }
 
 	/**
 	 * setAppConf
@@ -173,8 +215,10 @@ class App extends \Swoolefy\Core\Component {
 		if(isset($this->app_conf['catch_handle']) && $handle = $this->app_conf['catch_handle']) {
             $this->is_end = true;
 			if(is_array($handle)) {
-				$this->response->header('Content-Type','application/json; charset=UTF-8');
-				$this->response->end(json_encode($handle, JSON_UNESCAPED_UNICODE));
+			    /**@var Response $response */
+			    $response = $this->container['response'];
+                $response->withHeader('Content-Type','application/json; charset=UTF-8');
+				$response->write(json_encode($handle, JSON_UNESCAPED_UNICODE));
 			}else if($handle instanceof \Closure) {
                 $handle->call($this, $this->request, $this->response);
 			}else {
@@ -263,7 +307,7 @@ class App extends \Swoolefy\Core\Component {
         // remove App Instance
 		Application::removeApp();
         if(!$this->is_end) {
-            @$this->response->end();
+            @$this->swooleResponse->end();
         }
 	}
 

@@ -27,7 +27,6 @@ class AppInit extends AppObject {
 		foreach($request->header as $key => $value) {
             $_key = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
             $request->server[$_key] = $value;
-            $request->header[$_key] = $value;
         }
 	}
 }

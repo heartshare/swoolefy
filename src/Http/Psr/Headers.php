@@ -47,44 +47,9 @@ class Headers extends Collection implements HeadersInterface
      *
      * @return self
      */
-    public static function createFromEnvironment(Environment $environment)
+    public static function mack(array $headers)
     {
-        $data = [];
-        $environment = self::determineAuthorization($environment);
-        foreach ($environment as $key => $value) {
-            $key = strtoupper($key);
-            if (isset(static::$special[$key]) || strpos($key, 'HTTP_') === 0) {
-                if ($key !== 'HTTP_CONTENT_LENGTH') {
-                    $data[$key] =  $value;
-                }
-            }
-        }
-
-        return new static($data);
-    }
-
-    /**
-     * If HTTP_AUTHORIZATION does not exist tries to get it from
-     * getallheaders() when available.
-     *
-     * @param Environment $environment The Slim application Environment
-     *
-     * @return Environment
-     */
-
-    public static function determineAuthorization(Environment $environment)
-    {
-        $authorization = $environment->get('HTTP_AUTHORIZATION');
-
-        if (empty($authorization) && is_callable('getallheaders')) {
-            $headers = getallheaders();
-            $headers = array_change_key_case($headers, CASE_LOWER);
-            if (isset($headers['authorization'])) {
-                $environment->set('HTTP_AUTHORIZATION', $headers['authorization']);
-            }
-        }
-
-        return $environment;
+        return new static($headers);
     }
 
     /**
@@ -211,11 +176,10 @@ class Headers extends Collection implements HeadersInterface
      */
     public function normalizeKey($key)
     {
-        $key = strtr(strtolower($key), '_', '-');
-        if (strpos($key, 'http-') === 0) {
+        $key = str_replace('_', '-', strtolower($key));
+        if(strpos($key, 'http-') === 0) {
             $key = substr($key, 5);
         }
-
         return $key;
     }
 }

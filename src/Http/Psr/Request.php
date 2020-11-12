@@ -82,7 +82,7 @@ class Request extends Message implements ServerRequestInterface
     /**
      * The request attributes (route segment names and values)
      *
-     * @var \Slim\Collection
+     * @var Collection
      */
     protected $attributes;
 
@@ -108,6 +108,16 @@ class Request extends Message implements ServerRequestInterface
     protected $uploadedFiles;
 
     /**
+     * @var \swoole\Http\Request
+     */
+    protected $swooleRequest;
+
+    /**
+     * @var \Swoole\Http\Response
+     */
+    protected $swooleResponse;
+
+    /**
      * Valid request methods
      *
      * @var string[]
@@ -126,19 +136,17 @@ class Request extends Message implements ServerRequestInterface
     ];
 
     /**
-     * Create new HTTP request with data extracted from the application
-     * Environment object
-     *
-     * @param  Environment $environment The Slim application Environment
-     *
-     * @return static
+     * @param Environment $environment
+     * @param array $headers
+     * @param array $cookies
+     * @return Request
+     * @throws \Exception
      */
-    public static function createFromEnvironment(Environment $environment)
+    public static function createFromEnvironment(Environment $environment, array $headers, array $cookies)
     {
         $method = $environment['REQUEST_METHOD'];
         $uri = Uri::createFromEnvironment($environment);
-        $headers = Headers::createFromEnvironment($environment);
-        $cookies = Cookies::parseHeader($headers->get('Cookie', []));
+        $headers = Headers::mack($headers);
         $serverParams = $environment->all();
         $body = new RequestBody();
         $uploadedFiles = UploadedFile::createFromEnvironment($environment);
@@ -1223,5 +1231,37 @@ class Request extends Message implements ServerRequestInterface
         }
 
         return $params;
+    }
+
+    /**
+     * @param \Swoole\Http\Request $swooleRequest
+     */
+    public function setSwooleRequest(\Swoole\Http\Request $swooleRequest)
+    {
+        $this->swooleRequest = $swooleRequest;
+    }
+
+    /**
+     * @param \Swoole\Http\Response $swooleRequest
+     */
+    public function setSwooleResponse(\Swoole\Http\Response $swooleResponse)
+    {
+        $this->swooleResponse = $swooleResponse;
+    }
+
+    /**
+     * @return \swoole\Http\Request
+     */
+    public function getSwooleRequest()
+    {
+        return $this->swooleRequest;
+    }
+
+    /**
+     * @return \Swoole\Http\Response
+     */
+    public function getSwooleResponse()
+    {
+        return $this->swooleResponse;
     }
 }
